@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="color_orange">#FF9224</color>
+    <color name="navpage">#ffe1e0de</color>
+    <color name="light_gray">#BEBEBE</color>
+    <color name="lit_light_gray">#E0E0E0</color>
+	<color name="black">#ff000000</color>
+	<color name="gray">#ff666666</color>
+	<color name="path_black">#ff333333</color>
+</resources>

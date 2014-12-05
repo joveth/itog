@@ -1,0 +1,15 @@
+<resources>
+
+    <style name="Theme.Germany" parent="@style/Theme.AppCompat.Light">
+        <item name="actionBarItemBackground">@drawable/selectable_background_germany</item>
+        <item name="popupMenuStyle">@style/PopupMenu.Germany</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Germany</item>
+        <item name="actionBarTabStyle">@style/ActionBarTabStyle.Germany</item>
+        <item name="actionDropDownStyle">@style/DropDownNav.Germany</item>
+        <item name="actionBarStyle">@style/ActionBar.Solid.Germany</item>
+        <item name="actionModeBackground">@drawable/cab_background_top_germany</item>
+        <item name="actionModeSplitBackground">@drawable/cab_background_bottom_germany</item>
+        <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Germany</item>
+    </style>
+
+</resources>

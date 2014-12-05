@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">IT博客</string>
+    <string name="app_ic_fav">我的收藏</string>
+    <string name="app_ic_about">关于</string>
+    <string name="app_ic_addfav">加入收藏</string>
+    <string name="app_ic_clearfav">全部清空</string>
+    <string name="fragment_image_str">CSDN</string>
+    <string name="fragment_text_str">博客园</string>
+    <string name="fragment_both_str">ITEYE</string>
+    <string name="fragment_osc_str">开源中国</string>
+    <string name="drag_to_refresh">下拉刷新</string>
+    <string name="setting_version">IT博客 1.0</string>
+    <string name="setting_contact">联系信息</string>
+    <string name="setting_author">作者：</string>
+    <string name="setting_author_name">joveth</string>
+    <string name="setting_qq">Q  Q：</string>
+    <string name="setting_qq_num">247911950</string>
+    <string name="setting_mail">邮箱：</string>
+    <string name="setting_mail_addr">funny_ba@163.com</string>
+    <string name="setting_weibo">微博：</string>
+    <string name="setting_weibo_addr">新浪http://weibo.com/u/2096710855</string>
+    <string name="setting_app_infor">软件声明</string>
+    <string name="setting_copyright">该软件主要是为喜欢看IT博客的人开发的，简单的抓取网站上的内容，其中的数据主要来源于各博客网站，本人声明，博客的内容归博客主所有，若你认为对你造成侵权的，请及时联系我，本人将会将该软件撤销或下线。</string>
+    <string name="setting_app_for">未来计划</string>
+    <string name="setting_for">现在的版本实际上没有太多功能，只是作者个人由于喜欢看博客，而又懒得一个一个去点各网站，所以才有了这个APP，未来我想给它加更多的功能，如：增加离线功能，像我这样的流量狗就可以在地铁或公交上看了；又比如优化文章的显示，让文章看起来更接近PC等等，嘛，毕竟一个人，要是有人喜欢的话，可以到https://github.com/joveth上fork</string>
+    <string name="setting_author_is">作者の梗</string>
+    <string name="setting_author_fuck">如果你想要和我合作不管是什么性质的，亲，联系我。如果你觉得软件做的不够好，那就邮件提意见，亲这个真的不收费，如果你觉得实在是不好用你可以来邮件骂我，若是你觉得这样骂不过瘾，你也可以跟我QQ语言当耳骂，若是你实在忍不住了，那，对不起，我不搞基好多年了。亲，一定要给我反馈意见哦。</string>
+    <string name="setting_suggest">意见反馈</string>
+    <string name="setting_send_suggest">发送反馈意见</string>
+    <string name="setting_hint">如果输入法弹出框遮盖了输入框，你可以向上拉一下哦</string>
+
+</resources>

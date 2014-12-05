@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.jov.itog.MainActivity" >
+
+   <item
+        android:id="@+id/menu_clearfav"
+        android:showAsAction="always"
+        android:title="@string/app_ic_clearfav"/>
+
+</menu>
