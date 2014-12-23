@@ -14,17 +14,21 @@ import android.os.Handler;
 
 import com.jov.bean.BlogBean;
 import com.jov.util.Constants;
+import com.jov.util.StringUtil;
 
 public class HTMLCNBLOGParser extends HTMLParser {
-	public HTMLCNBLOGParser(Handler hand, String url) {
-		super(hand, url);
+	public HTMLCNBLOGParser(Handler hand, String url, boolean isNeedGetContent) {
+		super(hand, url,isNeedGetContent);
 	}
 
-	public List<BlogBean> parser(String url) throws ClientProtocolException,
+	public List<BlogBean> parser(String url, boolean isNeedGetContent) throws ClientProtocolException,
 			IOException {
 		String htmlStr = GetResource.doGet(url);
 		List<BlogBean> blogList = new ArrayList<BlogBean>();
 		BlogBean blog = null;
+		if(StringUtil.isEmpty(htmlStr)){
+			return blogList;
+		}
 		Document doc = Jsoup.parse(htmlStr);
 		Elements units = doc.getElementsByClass(Constants.CN_BLOG_LIST);
 		for (int i = 0; i < units.size(); i++) {
@@ -61,6 +65,11 @@ public class HTMLCNBLOGParser extends HTMLParser {
 			Element comment_ele = other_ele.child(1);
 			String comment = comment_ele.text();
 			blog.setComment(comment);
+			blog.setSourceType(Constants.CNBLOG_FLAG_3);
+			if(isNeedGetContent){
+				String content = getHTML(GetResource.getHtml(href, "utf-8"));
+				blog.setContent(content);
+			}
 			blogList.add(blog);
 		}
 		return blogList;

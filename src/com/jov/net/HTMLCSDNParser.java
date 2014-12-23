@@ -16,11 +16,11 @@ import com.jov.bean.BlogBean;
 import com.jov.util.Constants;
 
 public class HTMLCSDNParser extends HTMLParser {
-	public HTMLCSDNParser(Handler hand, String url) {
-		super(hand, url);
+	public HTMLCSDNParser(Handler hand, String url, boolean isNeedGetContent) {
+		super(hand, url,isNeedGetContent);
 	}
 
-	public List<BlogBean> parser(String url) throws ClientProtocolException,
+	public List<BlogBean> parser(String url, boolean isNeedGetContent) throws ClientProtocolException,
 			IOException {
 		String htmlStr = GetResource.doGet(url);
 		List<BlogBean> blogList = new ArrayList<BlogBean>();
@@ -62,7 +62,11 @@ public class HTMLCSDNParser extends HTMLParser {
 			Element comment_ele = span_ele.child(3);
 			String comment = comment_ele.text();
 			blog.setComment(comment);
-
+			blog.setSourceType(Constants.CSDN_FLAG_2);
+			if(isNeedGetContent){
+				String content = getHTML(GetResource.getHtml(href, "utf-8"));
+				blog.setContent(content);
+			}
 			blogList.add(blog);
 		}
 		return blogList;

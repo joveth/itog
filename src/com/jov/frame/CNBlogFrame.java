@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +15,11 @@ import android.widget.Toast;
 
 import com.jov.adapter.CSDNDataAdapter;
 import com.jov.bean.BlogBean;
+import com.jov.db.DBHelper;
 import com.jov.itog.R;
 import com.jov.net.HTMLParser;
 import com.jov.net.ThreadPoolUtils;
+import com.jov.util.Common;
 import com.jov.util.Constants;
 import com.jov.view.PullDownView;
 
@@ -32,6 +33,7 @@ public class CNBlogFrame extends Fragment implements
 	private ListView cnListView;
 	private static boolean isDoingUpdate = false;
 	private int pageNo = 1;
+	private DBHelper db;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,6 +41,7 @@ public class CNBlogFrame extends Fragment implements
 		view = inflater.inflate(R.layout.cnblog_frame, container, false);
 		context = view.getContext();
 		list = new ArrayList<BlogBean>();
+		db = new DBHelper(context);
 		initView();
 		return view;
 	}
@@ -52,8 +55,7 @@ public class CNBlogFrame extends Fragment implements
 		cnPullDownView.enableAutoFetchMore(true, 3);
 		cnPullDownView.setShowFooter();
 		cnPullDownView.setShowHeader();
-		ThreadPoolUtils.execute(new HTMLParser(cnHand, Constants.CN_BLOGS));
-		isDoingUpdate = true;
+		runThread();
 	}
 
 	private Handler cnHand = new Handler() {
@@ -67,7 +69,7 @@ public class CNBlogFrame extends Fragment implements
 					list.addAll(result);
 					cnAdapter.notifyDataSetChanged();
 					isDoingUpdate = false;
-					Log.v("listsize", list.size() + "");
+					pageNo = 1;
 				}
 				cnPullDownView.RefreshComplete();
 				break;
@@ -91,7 +93,7 @@ public class CNBlogFrame extends Fragment implements
 					list.addAll(result);
 					cnAdapter.notifyDataSetChanged();
 					isDoingUpdate = false;
-					Log.v("listsize", list.size() + "");
+					pageNo++;
 				}
 				cnPullDownView.notifyDidMore();
 				break;
@@ -105,20 +107,36 @@ public class CNBlogFrame extends Fragment implements
 		};
 	};
 
-	@Override
-	public void onRefresh() {
+	private void runThread() {
+		if (!Common.isNetworkConnected(context)) {
+			if (list.size() == 0) {
+				List<BlogBean> result = db.getBlog(Constants.CNBLOG_FLAG_3);
+				list.addAll(result);
+			}
+			cnPullDownView.RefreshComplete();
+			return;
+		}
 		if (!isDoingUpdate) {
-			ThreadPoolUtils.execute(new HTMLParser(cnHand, Constants.CN_BLOGS));
+			ThreadPoolUtils.execute(new HTMLParser(cnHand, Constants.CN_BLOGS,
+					false));
 			isDoingUpdate = true;
 		}
 	}
 
 	@Override
+	public void onRefresh() {
+		runThread();
+	}
+
+	@Override
 	public void onMore() {
+		if (!Common.isNetworkConnected(context)) {
+			cnPullDownView.notifyDidMore();
+			return;
+		}
 		if (!isDoingUpdate) {
-			pageNo++;
 			ThreadPoolUtils.execute(new HTMLParser(nextPageCNBLOGHand,
-					Constants.CN_BLOGS + "?&page=" + pageNo));
+					Constants.CN_BLOGS + "?&page=" + pageNo, false));
 			isDoingUpdate = true;
 		}
 	}

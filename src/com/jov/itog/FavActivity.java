@@ -3,6 +3,7 @@ package com.jov.itog;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -15,8 +16,10 @@ import android.widget.Toast;
 import com.jov.adapter.CSDNDataAdapter;
 import com.jov.bean.BlogBean;
 import com.jov.db.DBHelper;
+import com.jov.util.Constants;
 import com.jov.view.PullDownView;
 
+@SuppressLint("NewApi")
 public class FavActivity extends Activity implements
 		PullDownView.OnPullDownListener {
 	private List<BlogBean> list;
@@ -33,17 +36,19 @@ public class FavActivity extends Activity implements
 		setContentView(R.layout.fav_frame);
 		list = new ArrayList<BlogBean>();
 		db = new DBHelper(this);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		initData();
 		initView();
 	}
 
 	private void initData() {
-		total = db.getTotalCount() % 20 == 0 ? db.getTotalCount() / 20 : (db
-				.getTotalCount() / 20 + 1);
+		int temp = db.getTotalCount(Constants.FAV_FLAG_1);
+		total = temp % 20 == 0 ? temp / 20 : (temp / 20 + 1);
 		if (total == 0)
-			Toast.makeText(FavActivity.this, "亲，还没有收藏哦", Toast.LENGTH_SHORT).show();
+			Toast.makeText(FavActivity.this, "亲，还没有收藏哦", Toast.LENGTH_SHORT)
+					.show();
 		list.clear();
-		list.addAll(db.getBlog(pageNo));
+		list.addAll(db.getBlog(pageNo, Constants.FAV_FLAG_1));
 	}
 
 	private void initView() {
@@ -73,7 +78,7 @@ public class FavActivity extends Activity implements
 			pageNo = total;
 		} else {
 			pageNo++;
-			list.addAll(db.getBlog(pageNo));
+			list.addAll(db.getBlog(pageNo, Constants.FAV_FLAG_1));
 			cnAdapter.notifyDataSetChanged();
 		}
 		cnPullDownView.notifyDidMore();
@@ -88,25 +93,33 @@ public class FavActivity extends Activity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		if (id == R.id.menu_clearfav&&total!=0) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);  
-			builder.setMessage("亲，确定全部清空吗？")  
-			       .setCancelable(false)  
-			       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {  
-			           public void onClick(DialogInterface dialog, int id) {  
-			        	   db.deleteAll();
-				   			list.clear();
-				   			cnAdapter.notifyDataSetChanged();
-				   			Toast.makeText(FavActivity.this, "已清空", Toast.LENGTH_SHORT).show();
-			           }  
-			       })  
-			       .setNegativeButton("No", new DialogInterface.OnClickListener() {  
-			           public void onClick(DialogInterface dialog, int id) {  
-			                dialog.cancel();  
-			           }  
-			       });  
-			AlertDialog alert = builder.create();  
+		if (id == R.id.menu_clearfav && total != 0) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("亲，确定全部清空吗？")
+					.setCancelable(false)
+					.setPositiveButton("Yes",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									db.deleteAll(false, Constants.FAV_FLAG_1);
+									list.clear();
+									cnAdapter.notifyDataSetChanged();
+									Toast.makeText(FavActivity.this, "已清空",
+											Toast.LENGTH_SHORT).show();
+								}
+							})
+					.setNegativeButton("No",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+								}
+							});
+			AlertDialog alert = builder.create();
 			alert.show();
+			return true;
+		} else if (id == android.R.id.home) {
+			finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

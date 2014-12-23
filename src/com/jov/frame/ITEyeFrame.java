@@ -15,9 +15,11 @@ import android.widget.Toast;
 
 import com.jov.adapter.CSDNDataAdapter;
 import com.jov.bean.BlogBean;
+import com.jov.db.DBHelper;
 import com.jov.itog.R;
 import com.jov.net.HTMLParser;
 import com.jov.net.ThreadPoolUtils;
+import com.jov.util.Common;
 import com.jov.util.Constants;
 import com.jov.view.PullDownView;
 
@@ -31,6 +33,7 @@ public class ITEyeFrame extends Fragment implements
 	private ListView mListView;
 	private static boolean isDoingUpdate = false;
 	private int pageNo = 1;
+	private DBHelper db;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,6 +41,7 @@ public class ITEyeFrame extends Fragment implements
 		view = inflater.inflate(R.layout.iteye_frame, container, false);
 		context = view.getContext();
 		list = new ArrayList<BlogBean>();
+		db = new DBHelper(context);
 		initView();
 		return view;
 	}
@@ -51,9 +55,23 @@ public class ITEyeFrame extends Fragment implements
 		mPullDownView.enableAutoFetchMore(true, 3);
 		mPullDownView.setShowFooter();
 		mPullDownView.setShowHeader();
-		ThreadPoolUtils.execute(new HTMLParser(resourceHand,
-				Constants.ITEYE_BLOG));
-		isDoingUpdate = true;
+		runThread();
+	}
+
+	private void runThread() {
+		if (!Common.isNetworkConnected(context)) {
+			if (list.size() == 0) {
+				List<BlogBean> result = db.getBlog(Constants.ITEYE_FLAG_4);
+				list.addAll(result);
+			}
+			mPullDownView.RefreshComplete();
+			return;
+		}
+		if (!isDoingUpdate) {
+			ThreadPoolUtils.execute(new HTMLParser(resourceHand,
+					Constants.ITEYE_BLOG, false));
+			isDoingUpdate = true;
+		}
 	}
 
 	private Handler resourceHand = new Handler() {
@@ -67,8 +85,11 @@ public class ITEyeFrame extends Fragment implements
 					list.addAll(result);
 					adapter.notifyDataSetChanged();
 					isDoingUpdate = false;
+					pageNo = 1;
 				}
 				mPullDownView.RefreshComplete();
+				break;
+			case 110:
 				break;
 			default:
 				Toast.makeText(context, "【ITEYE】请求出现异常，您可以尝试再次刷新！",
@@ -90,6 +111,7 @@ public class ITEyeFrame extends Fragment implements
 					list.addAll(result);
 					adapter.notifyDataSetChanged();
 					isDoingUpdate = false;
+					pageNo++;
 				}
 				mPullDownView.notifyDidMore();
 				break;
@@ -105,19 +127,19 @@ public class ITEyeFrame extends Fragment implements
 
 	@Override
 	public void onRefresh() {
-		if (!isDoingUpdate) {
-			ThreadPoolUtils.execute(new HTMLParser(resourceHand,
-					Constants.ITEYE_BLOG));
-			isDoingUpdate = true;
-		}
+		runThread();
 	}
 
 	@Override
 	public void onMore() {
 		if (!isDoingUpdate) {
-			pageNo++;
+			if (!Common.isNetworkConnected(context)) {
+				mPullDownView.notifyDidMore();
+				return;
+			}
+
 			ThreadPoolUtils.execute(new HTMLParser(nextPageHand,
-					Constants.ITEYE_BLOG + "?page=" + pageNo));
+					Constants.ITEYE_BLOG + "?page=" + pageNo, false));
 			isDoingUpdate = true;
 		}
 	}

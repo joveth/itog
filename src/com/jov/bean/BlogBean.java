@@ -12,6 +12,10 @@ public class BlogBean {
 	private String author;
 	private String read;
 	private String comment;
+	/***
+	 * 1.fav 2.csdn 3.cnblog 4.iteye 5.oschina
+	 * */
+	private String sourceType;
 
 	public int getBid() {
 		return bid;
@@ -101,4 +105,11 @@ public class BlogBean {
 		this.comment = comment;
 	}
 
+	public String getSourceType() {
+		return sourceType;
+	}
+
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
+	}
 }

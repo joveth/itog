@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +15,11 @@ import android.widget.Toast;
 
 import com.jov.adapter.CSDNDataAdapter;
 import com.jov.bean.BlogBean;
+import com.jov.db.DBHelper;
 import com.jov.itog.R;
 import com.jov.net.HTMLParser;
 import com.jov.net.ThreadPoolUtils;
+import com.jov.util.Common;
 import com.jov.util.Constants;
 import com.jov.view.PullDownView;
 
@@ -32,6 +33,7 @@ public class CSDNFrame extends Fragment implements
 	private ListView mListView;
 	private static boolean isDoingUpdate = false;
 	private int pageNo = 1;
+	private DBHelper db;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,6 +41,7 @@ public class CSDNFrame extends Fragment implements
 		view = inflater.inflate(R.layout.csdn_frame, container, false);
 		context = view.getContext();
 		list = new ArrayList<BlogBean>();
+		db = new DBHelper(context);
 		initView();
 		return view;
 	}
@@ -52,8 +55,23 @@ public class CSDNFrame extends Fragment implements
 		mPullDownView.enableAutoFetchMore(true, 3);
 		mPullDownView.setShowHeader();
 		mPullDownView.setShowFooter();
-		ThreadPoolUtils.execute(new HTMLParser(csdnHand, Constants.CSDN_BLOG));
-		isDoingUpdate = true;
+		runThread();
+	}
+
+	private void runThread() {
+		if (!Common.isNetworkConnected(context)) {
+			if (list.size() == 0) {
+				List<BlogBean> result = db.getBlog(Constants.CSDN_FLAG_2);
+				list.addAll(result);
+			}
+			mPullDownView.RefreshComplete();
+			return;
+		}
+		if (!isDoingUpdate) {
+			ThreadPoolUtils.execute(new HTMLParser(csdnHand,
+					Constants.CSDN_BLOG, false));
+			isDoingUpdate = true;
+		}
 	}
 
 	private Handler csdnHand = new Handler() {
@@ -67,9 +85,11 @@ public class CSDNFrame extends Fragment implements
 					list.addAll(result);
 					adapter.notifyDataSetChanged();
 					isDoingUpdate = false;
-					Log.v("listsize", list.size() + "");
+					pageNo = 1;
 				}
 				mPullDownView.RefreshComplete();
+				break;
+			case 110:
 				break;
 			default:
 				Toast.makeText(context, "【CSDN】请求出现异常，您可以尝试再次刷新！",
@@ -91,7 +111,7 @@ public class CSDNFrame extends Fragment implements
 					list.addAll(result);
 					adapter.notifyDataSetChanged();
 					isDoingUpdate = false;
-					Log.v("listsize", list.size() + "");
+					pageNo++;
 				}
 				mPullDownView.notifyDidMore();
 				break;
@@ -107,19 +127,19 @@ public class CSDNFrame extends Fragment implements
 
 	@Override
 	public void onRefresh() {
-		if (!isDoingUpdate) {
-			ThreadPoolUtils.execute(new HTMLParser(csdnHand,
-					Constants.CSDN_BLOG));
-			isDoingUpdate = true;
-		}
+		runThread();
 	}
 
 	@Override
 	public void onMore() {
 		if (!isDoingUpdate) {
-			pageNo++;
+			if (!Common.isNetworkConnected(context)) {
+				mPullDownView.notifyDidMore();
+				return;
+			}
+
 			ThreadPoolUtils.execute(new HTMLParser(nextPageCSDNHand,
-					Constants.CSDN_BLOG + "?&page=" + pageNo));
+					Constants.CSDN_BLOG + "?&page=" + pageNo, false));
 			isDoingUpdate = true;
 		}
 	}

@@ -1,5 +1,6 @@
 package com.jov.itog;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,14 +27,15 @@ public class WebViewActivity extends Activity {
 	private View progress_bar;
 	private DBHelper db;
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.webview_content);
-
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		myWebView = (WebView) findViewById(R.id.webview_content);
 		progress_bar = (View) findViewById(R.id.progress_bar);
-
+		db = new DBHelper(this);
 		DisplayMetrics dm = getResources().getDisplayMetrics();
 		int scale = dm.densityDpi;
 		if (scale == 240) { //
@@ -49,9 +51,20 @@ public class WebViewActivity extends Activity {
 
 	private void initView() {
 		if (!Common.isNetworkConnected(this)) {
-			Toast.makeText(WebViewActivity.this, "Ç×£¬Ä¾ÓÐÍøÂçÅ¶¡­¡­", Toast.LENGTH_LONG)
-					.show();
-			finish();
+			int bid = intent.getIntExtra("bid", 0);
+			if (bid != 0) {
+				BlogBean bean = db.getBlogByid(bid);
+				if (StringUtil.isEmpty(bean.getContent())) {
+					finish();
+				}
+				myWebView.loadDataWithBaseURL(null, bean.getContent(),
+						"text/html", "utf-8", null);
+				progress_bar.setVisibility(View.GONE);
+			} else {
+				Toast.makeText(WebViewActivity.this, "Ç×£¬Ä¾ÓÐÍøÂçÅ¶¡­¡­",
+						Toast.LENGTH_LONG).show();
+				finish();
+			}
 			return;
 		}
 		String url = intent.getStringExtra("url");
@@ -69,7 +82,6 @@ public class WebViewActivity extends Activity {
 			case 200:
 				String result = (String) msg.obj;
 				if (result != null) {
-					Log.v("html", result);
 					myWebView.loadDataWithBaseURL(null, result, "text/html",
 							"utf-8", null);
 					progress_bar.setVisibility(View.GONE);
@@ -99,7 +111,7 @@ public class WebViewActivity extends Activity {
 		int id = item.getItemId();
 		if (id == R.id.menu_addfav) {
 			if (intent != null) {
-				db = new DBHelper(this);
+
 				BlogBean bean = new BlogBean();
 				bean.setAuthor(intent.getStringExtra("author"));
 				bean.setComment(intent.getStringExtra("comment"));
@@ -109,10 +121,16 @@ public class WebViewActivity extends Activity {
 				bean.setShortDesc(intent.getStringExtra("shortDesc"));
 				bean.setSortType(intent.getStringExtra("sortType"));
 				bean.setTitle(intent.getStringExtra("title"));
-				db.insertBlog(bean);
+				bean.setSourceType("1");
+				if (!db.hasTheSame(bean.getTitle())) {
+					db.insertBlog(bean);
+				}
 				Toast.makeText(WebViewActivity.this, "ÒÑÊÕ²Ø", Toast.LENGTH_SHORT)
 						.show();
 			}
+			return true;
+		} else if (id == android.R.id.home) {
+			finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

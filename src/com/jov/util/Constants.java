@@ -9,4 +9,10 @@ public class Constants {
 	public static final String ITEYE_LIST="content";
 	public static final  String OSCHINA_BLOG="http://www.oschina.net/blog";
 	public static final String OSC_LIST="RecentBlogs";
+	public static final String FAV_FLAG_1="1";
+	public static final String CSDN_FLAG_2="2";
+	public static final String CNBLOG_FLAG_3="3";
+	public static final String ITEYE_FLAG_4="4";
+	public static final String OSCHINA_FLAG_5="5";
+	
 }

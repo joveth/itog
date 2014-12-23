@@ -18,7 +18,7 @@ public class ThreadPoolUtils {
 	}
 
 	// 定义核心线程数，并行线程数
-	private static int CORE_POOL_SIZE = 3;
+	private static int CORE_POOL_SIZE = 5;
 
 	// 线程池最大线程数：除了正在运行的线程额外保存多少个线程
 	private static int MAX_POOL_SIZE = 8;

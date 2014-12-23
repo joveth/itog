@@ -24,6 +24,7 @@ import android.widget.RemoteViews;
 import com.jov.bean.UpdateBean;
 import com.jov.itog.MainActivity;
 import com.jov.itog.R;
+import com.jov.util.Common;
 import com.jov.util.FileUtil;
 import com.jov.util.XMLReader;
 
@@ -40,7 +41,7 @@ public class UpdateManager {
 	private int notification_id = 0;
 	private String uri = "http://jovmusic.qiniudn.com/";
 	private Context context;
-	private String version = "2";
+	private String version = "3";
 	private UpdateBean bean;
 
 	public UpdateManager(Context context) {
@@ -48,6 +49,9 @@ public class UpdateManager {
 	}
 
 	public void checkVersionThread() {
+		if (!Common.isNetworkConnected(context)) {
+			return;
+		}
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -79,7 +83,6 @@ public class UpdateManager {
 		}).start();
 	}
 
-	
 	private final Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
@@ -92,7 +95,7 @@ public class UpdateManager {
 						"application/vnd.android.package-archive");
 				pendingIntent = PendingIntent
 						.getActivity(context, 0, intent, 0);
-				notification.tickerText="IT博客下载完成，点击安装";
+				notification.tickerText = "IT博客下载完成，点击安装";
 				notification.setLatestEventInfo(context, "IT博客", "下载完成，点击安装",
 						pendingIntent);
 				notificationManager.notify(notification_id, notification);
@@ -175,7 +178,7 @@ public class UpdateManager {
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		notification = new Notification();
 		notification.icon = R.drawable.ic_launcher;
-		notification.tickerText="IT博客更新";
+		notification.tickerText = "IT博客更新";
 		contentView = new RemoteViews(context.getPackageName(),
 				R.layout.notification_item);
 		contentView.setTextViewText(R.id.notificationTitle, "正在下载");
@@ -190,7 +193,7 @@ public class UpdateManager {
 	}
 
 	private long downloadUpdateFile(String down_url, File file) {
-		if (file==null){
+		if (file == null) {
 			return 0;
 		}
 		int down_step = 5;// 提示step

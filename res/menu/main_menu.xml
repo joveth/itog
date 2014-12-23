@@ -2,6 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_switch"
+        android:showAsAction="always"
+        android:title="@string/app_ic_switch"/>
+    <item
+        android:id="@+id/menu_download"
+        android:icon="@drawable/icon_brief_download"
+        android:showAsAction="always"
+        android:title="@string/app_ic_dwn"/>
+    <item
         android:id="@+id/menu_fav"
         android:icon="@drawable/icon_pb_collect_n"
         android:showAsAction="always"

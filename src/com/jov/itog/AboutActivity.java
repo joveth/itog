@@ -1,10 +1,9 @@
 package com.jov.itog;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +13,7 @@ import com.jov.util.Common;
 import com.jov.util.MailSender;
 import com.jov.util.StringUtil;
 
+@SuppressLint("NewApi")
 public class AboutActivity extends Activity {
 	private Button sendMsgBtn;
 
@@ -21,6 +21,7 @@ public class AboutActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.about);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		initView();
 	}
 
@@ -51,6 +52,16 @@ public class AboutActivity extends Activity {
 				tx.setEnabled(false);
 			}
 		});
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == android.R.id.home) {
+			finish();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void showAlert(String msg) {

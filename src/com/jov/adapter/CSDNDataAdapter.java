@@ -100,6 +100,7 @@ public class CSDNDataAdapter extends BaseAdapter {
 				intent.putExtra("read", list.get(position).getRead());
 				intent.putExtra("comment", list.get(position).getComment());
 				intent.putExtra("title", list.get(position).getTitle());
+				intent.putExtra("bid", list.get(position).getBid());
 				ctx.startActivity(intent);
 			}
 		});

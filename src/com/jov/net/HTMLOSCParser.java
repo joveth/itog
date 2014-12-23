@@ -16,13 +16,14 @@ import com.jov.bean.BlogBean;
 import com.jov.util.Constants;
 
 public class HTMLOSCParser extends HTMLParser {
-	public HTMLOSCParser(Handler hand, String url) {
-		super(hand, url);
+	public HTMLOSCParser(Handler hand, String url, boolean isNeedGetContent) {
+		super(hand, url, isNeedGetContent);
 	}
 
-	public List<BlogBean> parser(String url) throws ClientProtocolException,
-			IOException {
-		String htmlStr = GetResource.doGet(url);
+	public List<BlogBean> parser(String url, boolean isNeedGetContent)
+			throws ClientProtocolException, IOException {
+		String htmlStr = null;
+		htmlStr = GetResource.getHtml(url, "utf-8");
 		List<BlogBean> blogList = new ArrayList<BlogBean>();
 		BlogBean blog = null;
 		if (htmlStr == null) {
@@ -47,6 +48,11 @@ public class HTMLOSCParser extends HTMLParser {
 			Element other_ele = div_ele.getElementsByClass("date").get(0);// dl
 			String userName = other_ele.text();
 			blog.setAuthor(userName);
+			blog.setSourceType(Constants.OSCHINA_FLAG_5);
+			if (isNeedGetContent) {
+				String content = getHTML(GetResource.getHtml(href, "utf-8"));
+				blog.setContent(content);
+			}
 			blogList.add(blog);
 		}
 		return blogList;
@@ -57,11 +63,11 @@ public class HTMLOSCParser extends HTMLParser {
 		Document doc = Jsoup.parse(result);
 		String html = htmlHeader;
 		html += doc.getElementsByClass("BlogTitle").get(0).html();
-		if( doc.getElementsByClass("BlogAbstracts").size()>0){
+		if (doc.getElementsByClass("BlogAbstracts").size() > 0) {
 			html += doc.getElementsByClass("BlogAbstracts").get(0).html();
 		}
 		html += doc.getElementsByClass("BlogContent").get(0).html();
-		if( doc.getElementsByClass("BlogComments").size()>0){
+		if (doc.getElementsByClass("BlogComments").size() > 0) {
 			html += doc.getElementsByClass("BlogComments").get(0).html();
 		}
 		return html;

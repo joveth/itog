@@ -3,6 +3,9 @@ package com.jov.itog;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -22,9 +25,13 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jov.net.DownloadManager;
 import com.jov.net.UpdateManager;
+import com.jov.util.Common;
+import com.jov.util.Constants;
 import com.jov.view.DethPageTransformer;
 
+@SuppressLint("NewApi")
 public class MainActivity extends FragmentActivity {
 
 	public static final String PAGE1_ID = "page1";
@@ -41,7 +48,7 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		getActionBar().setHomeButtonEnabled(true);
 		// 初始化资源
 		pager = (ViewPager) findViewById(R.id.viewpager);
 		tabHost = (TabHost) findViewById(R.id.tab_host);
@@ -94,6 +101,10 @@ public class MainActivity extends FragmentActivity {
 		tabHost.setOnTabChangedListener(new TabChangeListener());
 		UpdateManager updateManager = new UpdateManager(this);
 		updateManager.checkVersionThread();
+		if (!Common.isNetworkConnected(this)) {
+			Toast.makeText(this, "亲，木有开启网络哦！", Toast.LENGTH_SHORT).show();
+			return;
+		}
 	}
 
 	/**
@@ -204,6 +215,39 @@ public class MainActivity extends FragmentActivity {
 			return true;
 		} else if (id == R.id.menu_setting) {
 			switchTo(AboutActivity.class);
+			return true;
+		} else if (id == android.R.id.home) {
+			switchTo(DownloadActivity.class);
+		} else if (id == R.id.menu_download) {
+			if (!Common.isNetworkConnected(this)) {
+				Toast.makeText(this, "网络未开启，无法离线", Toast.LENGTH_SHORT).show();
+				return true;
+			}
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage("只会缓存各博客网站的第一页内容，并清除上次缓存的内容，确定缓存吗？")
+					.setCancelable(false)
+					.setPositiveButton("Yes",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									DownloadManager download = new DownloadManager(
+											MainActivity.this);
+									download.doLoadThread();
+								}
+							})
+					.setNegativeButton("No",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+								}
+							});
+			AlertDialog alert = builder.create();
+			alert.show();
+
+		} else if (id == R.id.menu_switch) {
+			Toast.makeText(this, "切换到IT资讯功能暂未实现，敬请期待……", Toast.LENGTH_SHORT)
+					.show();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

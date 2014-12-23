@@ -17,7 +17,7 @@ public class HTMLGetThread implements Runnable {
 	public HTMLGetThread(Handler hand, String res) {
 		this.hand = hand;
 		url = res;
-		parser = new HTMLParser(hand, url).generatorParser();
+		parser = new HTMLParser(hand, url,false).generatorParser();
 	}
 
 	@Override

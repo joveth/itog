@@ -18,7 +18,7 @@ public class HTMLParser implements Runnable {
 	private static final String CSDN_DOMAIN = ".csdn.";
 	private static final String CNBLOG_DOMAIN = ".cnblogs.";
 	private static final String ITEYE_DOMAIN = ".iteye.";
-	private static final String OSC_DOMAIN=".oschina.";
+	private static final String OSC_DOMAIN = ".oschina.";
 	private HTMLParser htmlParser;
 	protected String htmlHeader = "<style type=\"text/css\"> a {color: #3E62A6;text-decoration: none;};"
 			+ " .cnblogs_code pre {font-family: Courier New!important;font-size: 12px!important;word-wrap: break-word;white-space: pre-wrap;};"
@@ -26,8 +26,8 @@ public class HTMLParser implements Runnable {
 			+ ".dp-highlighter ol li, .dp-highlighter .columns div {list-style: decimal-leading-zero;list-style-position: outside !important;border-left: 3px solid #6CE26C;background-color: #F8F8F8;color: #5C5C5C;padding: 0 3px 0 10px !important;margin: 0 !important;line-height: 150%;};"
 			+ ".news_tag a {display: inline-block;margin: 0 5px 5px 0;padding: 0px 10px;background-color: #aab5c3;-webkit-border-radius: 10px;-moz-border-radius: 10px;-o-border-radius: 10px;border-radius: 10px;color: #fff;text-decoration: none;}</style>";
 
-	public List<BlogBean> parser(String url) throws ClientProtocolException,
-			IOException {
+	public List<BlogBean> parser(String url, boolean isNeedGetContent)
+			throws ClientProtocolException, IOException {
 		return null;
 	}
 
@@ -35,26 +35,28 @@ public class HTMLParser implements Runnable {
 		return null;
 	}
 
-	public HTMLParser(Handler hand, String url) {
+	public HTMLParser(Handler hand, String url, boolean isNeedGetContent) {
 		this.hand = hand;
 		this.url = url;
+		this.isNeedGetContent = isNeedGetContent;
 	}
 
 	public HTMLParser generatorParser() {
 		if (url.contains(CSDN_DOMAIN)) {
-			return new HTMLCSDNParser(hand, url);
+			return new HTMLCSDNParser(hand, url, isNeedGetContent);
 		} else if (url.contains(CNBLOG_DOMAIN)) {
-			return new HTMLCNBLOGParser(hand, url);
+			return new HTMLCNBLOGParser(hand, url, isNeedGetContent);
 		} else if (url.contains(ITEYE_DOMAIN)) {
-			return new HTMLITEYEParser(hand, url);
-		}else if(url.contains(OSC_DOMAIN)){
-			return new HTMLOSCParser(hand, url);
+			return new HTMLITEYEParser(hand, url, isNeedGetContent);
+		} else if (url.contains(OSC_DOMAIN)) {
+			return new HTMLOSCParser(hand, url, isNeedGetContent);
 		}
 		return null;
 	}
 
 	private Handler hand;
 	private String url;
+	private boolean isNeedGetContent = false;
 
 	@Override
 	public void run() {
@@ -66,7 +68,7 @@ public class HTMLParser implements Runnable {
 			msg.what = 100;
 		} else {
 			try {
-				List<BlogBean> result = htmlParser.parser(url);
+				List<BlogBean> result = htmlParser.parser(url,isNeedGetContent);
 				msg.what = 200;
 				msg.obj = result;
 			} catch (ClientProtocolException e) {
