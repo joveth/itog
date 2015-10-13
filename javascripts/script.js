@@ -16,7 +16,7 @@ $(document).ready(function(){
         }
       }
     }
-    $(this).before("<pre class='lines'>" + lines.join("\n") + "</pre>");
+    //$(this).before("<pre class='lines'>" + lines.join("\n") + "</pre>");
   });
 
   var headings = [];
